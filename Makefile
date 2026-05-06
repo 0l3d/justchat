@@ -3,7 +3,7 @@ SOURCES = justchat.c
 OBJECTS = $(SOURCES:.c=.o)
 TARGET  = justchat
 
-CFLAGS  = -O2 -march=native
+CFLAGS  = -O2
 STATICLDFLAGS = -static -lwebsockets -lssl -lcrypto -lm -lz -lcap -lzstd
 LDFLAGS       = -lwebsockets 
 
