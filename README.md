@@ -1,11 +1,17 @@
 # justchat.
 Simple and Minimalist chat protocol and application (self-hostable).  
-  
+
+<img width="642" height="192" alt="image" src="https://github.com/user-attachments/assets/13745590-833f-4b30-b5d5-bf6426340673" />
+<img width="1365" height="745" alt="image" src="https://github.com/user-attachments/assets/658e60d0-5723-4606-889e-6e1b51e22f01" />
+
+
 ## Installation & Usage 
   
 Install from Github Releases or build yourself.  
 Static Release deps: `NONE`  
-Dynamic Release deps: `libwebsockets` and `libwebsockets's deps`  
+Dynamic Release deps: `libwebsockets` and `libwebsockets's deps`   
+  
+**INFO**: Gonna compile libwebsockets from scratch? install deps first. Or just get it from your package manager, it handles all dependencies for you.
   
 ### Build
 deps: `libwebsockets`  
@@ -19,10 +25,10 @@ make # dynamic or static
   
 ```
 $ ls 
-justchat. 
+justchat (dynamic or static)
 page/index.html
 page/404.html
-$ ./justchat.
+$ ./justchat (dynamic or static)
 ```  
 Then websocket is available on 8080 port!  
   
