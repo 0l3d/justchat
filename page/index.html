@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta name="generator" content=
+         "HTML Tidy for HTML5 for Linux version 5.8.0">
+      <title></title>
+      <style>
+         body {
+         background-color: #1a1a1a;
+         color: #ddd;
+         font-family: "Courier New", monospace;
+         margin: 0;
+         padding: 0;
+         }
+         #username_section,
+         #channel_section,
+         #message_section {
+         width: min(700px, 92vw);
+         margin: 16px auto;
+         padding: 14px;
+         background-color: #2a2a2a;
+         border: 2px solid #555;
+         box-sizing: border-box;
+         }
+         p {
+         margin: 6px 0;
+         font-size: 14px;
+         }
+         .warning {
+         color: #ff8080;
+         font-size: 13px;
+         }
+         .info {
+         color: #80c0ff;
+         font-size: 13px;
+         }
+         input[type="text"] {
+         width: 100%;
+         padding: 8px;
+         margin-top: 6px;
+         margin-bottom: 10px;
+         font-family: inherit;
+         border: 2px inset #444;
+         background-color: #111;
+         color: #eee;
+         box-sizing: border-box;
+         }
+         input[type="button"] {
+         padding: 8px 12px;
+         font-family: inherit;
+         border: 2px outset #666;
+         background-color: #333;
+         color: #eee;
+         cursor: pointer;
+         }
+         input[type="button"]:active {
+         border: 2px inset #666;
+         }
+         #messages {
+         height: 60vh;
+         overflow-y: auto;
+         background-color: #111;
+         border: 2px inset #444;
+         padding: 8px;
+         margin-bottom: 10px;
+         font-size: 14px;
+         display: flex;
+         flex-direction: column;
+         }
+         #messages p {
+         margin: 3px 0;
+         word-wrap: break-word;
+         }
+         .username {
+         color: #6cf;
+         }
+         .system {
+         color: #aaa;
+         font-style: italic;
+         }
+         #message_section input[type="text"] {
+         width: calc(100% - 90px);
+         display: inline-block;
+         margin-bottom: 0;
+         }
+         #message_section input[type="button"] {
+         width: 80px;
+         display: inline-block;
+         }
+         @media (max-width: 600px) {
+         #username_section,
+         #channel_section,
+         #message_section {
+         margin: 10px auto;
+         padding: 10px;
+         border-width: 1px;
+         }
+         p {
+         font-size: 13px;
+         }
+         #messages {
+         height: 55vh;
+         font-size: 13px;
+         }
+         input[type="text"] {
+         font-size: 14px;
+         padding: 10px;
+         }
+         input[type="button"] {
+         width: 100%;
+         margin-top: 6px;
+         }
+         #message_section input[type="text"],
+         #message_section input[type="button"] {
+         width: 100%;
+         display: block;
+         }
+         }
+      </style>
+   </head>
+   <body>
+      <head>
+         <meta name="generator" content=
+            "HTML Tidy for HTML5 for Linux version 5.8.0">
+         <meta charset="UTF-8">
+         <meta name="viewport" content=
+            "width=device-width, initial-scale=1.0">
+         <title></title>
+      </head>
+      <div id="username_section">
+         <p class="warning">Username and channel must be &lt; 32 chars
+            and not empty.
+         </p>
+         <p class="warning">',' character is not allowed.</p>
+         <p>Enter a username</p>
+         <input type="text" id="username">
+      </div>
+      <div id="channel_section">
+         <p>Enter a channel name</p>
+         <input type="text" id="channel">
+         <input type="button" id="submit" value="OK">
+         <p>Channels:</p>
+      </div>
+      <div id="message_section" style="visibility:hidden;">
+         <div id="messages"></div>
+         <input type="text" id="message">
+         <input type="button" id="send" value="OK">
+      </div>
+      <script>
+const WS_URL =
+  location.hostname === "localhost"
+    ? "ws://localhost:8080"
+    : `ws://${location.host}`;
+
+const socket = new WebSocket(WS_URL);
+         
+         // USERNAME
+         var username_section = document.getElementById("username_section");
+         var username = document.getElementById("username");
+         var ok = document.getElementById("submit");
+         
+         // CHANNEL
+         var channel_section = document.getElementById("channel_section");
+         var channel = document.getElementById("channel");
+         var message_section = document.getElementById("message_section");
+         
+         
+         
+         
+         var messages = document.getElementById("messages");
+         var message = document.getElementById("message");
+         var send = document.getElementById("send");
+         
+         
+         socket.addEventListener("open", (event) => {
+                 ok.onclick = function() {
+                         if (channel.value.length > 31 || username.value.length > 31) { 
+                                 return;
+                         }
+         
+                         username_section.remove()
+                         channel_section.remove()
+                         message_section.style.visibility = "visible";
+                         socket.send(channel.value + "," + username.value + "," + "joined the chat!");
+                         const pusername = document.createElement("p");
+                         const info = document.createTextNode("Channel: " + channel.value + " - Username: " + username.value)
+                         pusername.appendChild(info)
+                         message_section.appendChild(pusername);
+                 }
+                 send.onclick = function() {
+                         var raw_msg = channel.value + "," + username.value + "," + message.value;
+                         socket.send(raw_msg);
+                         message.value = "";
+                 }
+         });
+         
+         message.addEventListener("keypress", (e) => {
+         if (e.key === "Enter") {
+         send.click();
+         }
+         });
+         
+         socket.addEventListener("message", (event) => {
+         const p = document.createElement("p");
+         
+         let first = event.data.indexOf(',');
+         let second = event.data.indexOf(',', first + 1);
+         
+         let channel = event.data.slice(0, first);
+         let user = event.data.slice(first + 1, second);
+         let text = event.data.slice(second + 1);
+         
+         if (text.includes("joined the chat")) {
+         p.classList.add("system");
+         p.textContent = user + " joined";
+         } else {
+         const userSpan = document.createElement("span");
+         userSpan.classList.add("username");
+         userSpan.textContent = user + ": ";
+         
+         const msgText = document.createTextNode(text);
+         
+         p.appendChild(userSpan);
+         p.appendChild(msgText);
+         }
+         
+         messages.appendChild(p);
+         
+         messages.scrollTop = messages.scrollHeight;
+         });
+      </script>
+   </body>
+</html>
+
