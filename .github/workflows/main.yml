@@ -1,0 +1,65 @@
+# CI 
+name: Build and Release
+
+on:
+  push:
+    branches: [ "master" ]
+    tags: [ "v*" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container: debian:trixie-slim
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Install deps
+        run: |
+          apt-get update
+          apt-get install -y git build-essential libwebsockets-dev libssl-dev zlib1g-dev libpcap-dev libzstd-dev tar
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Version
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+          else
+            echo "VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          fi
+
+      - name: Build dynamic
+        run: |
+          make clean
+          make
+          test -f justchat
+          cp justchat justchat-dynamic
+
+      - name: Build static
+        run: |
+          make clean
+          make static
+          test -f justchat
+          cp justchat justchat-static
+
+      - name: Package
+        run: |
+          tar -czvf justchat-dynamic-${{ env.VERSION }}.tar.gz justchat-dynamic LICENSE.md page/
+          tar -czvf justchat-static-${{ env.VERSION }}.tar.gz justchat-static LICENSE.md page/
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            justchat-dynamic-${{ env.VERSION }}.tar.gz
+            justchat-static-${{ env.VERSION }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
