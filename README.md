@@ -1,6 +1,13 @@
 # justchat.
-Simple and Minimalist chat protocol and application (self-hostable).  
+Simple and Minimalist chat protocol and application (self-hostable). 
 
+## Features 
+- No database, no message storage. Fully RAM-based.
+- Anonymous, no login/auth system
+- Simple channel-based messaging.
+- Self-hostable.
+
+### Screenshots
 <img width="642" height="192" alt="image" src="https://github.com/user-attachments/assets/13745590-833f-4b30-b5d5-bf6426340673" />
 <img width="1365" height="745" alt="image" src="https://github.com/user-attachments/assets/658e60d0-5723-4606-889e-6e1b51e22f01" />
 
