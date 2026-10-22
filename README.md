@@ -23,7 +23,7 @@ Dynamic Release deps: `libwebsockets` and `libwebsockets's deps`
 ### Build
 deps: `libwebsockets`  
 ```
-git clone https://git.sr.ht/~oled/justchat
+git clone https://github.com/0l3d/justchat
 cd justchat/
 make # dynamic or static
 ```   
